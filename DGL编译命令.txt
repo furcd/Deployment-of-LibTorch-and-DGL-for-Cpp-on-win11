@@ -1,0 +1,45 @@
+# 获取源码和各种依赖
+git clone --recurse-submodules https://github.com/dmlc/dgl.git
+
+# 单独下载依赖项，若仅获取源码
+git submodule update --init --recursive
+
+
+
+# 修改cmakelist文件
+# 在project(dgl C CXX)这一行之前添加
+
+# 禁用 CUDA（CPU 环境）
+set(USE_CUDA OFF CACHE BOOL "" FORCE)
+# 禁用 Python 绑定（纯 C++ 编译）
+set(BUILD_PYTHON OFF CACHE BOOL "" FORCE)
+# 禁用 Graphbolt（减少依赖）
+set(BUILD_GRAPHBOLT OFF CACHE BOOL "" FORCE)
+# 禁用 Sparse 模块（可选，避免配置错误）
+set(BUILD_SPARSE OFF CACHE BOOL "" FORCE)
+# 禁用单元测试（加速编译）
+set(BUILD_TEST OFF CACHE BOOL "" FORCE)
+
+
+
+
+
+#建立目录
+rmdir /s /q build #先清理上次的
+md build & cd build
+
+
+#构建
+cmake .. -G "Visual Studio 17 2022" -A x64   -DCMAKE_PREFIX_PATH="C:\libtorch_cpu"  -DCMAKE_CONFIGURATION_TYPES="Release"   -DDMLC_FORCE_SHARED_CRT=ON         -DCMAKE_CXX_FLAGS="/DDGL_EXPORTS"     -DUSE_CUDA=OFF    -DBUILD_PYTHON=OFF     -DBUILD_TEST=OFF     
+
+
+
+#编译
+msbuild dgl.sln /m /p:Configuration=Release
+
+
+
+
+#安装
+cmake --install . --prefix "C:\dgl_cpp_cpu" --config Release
+##手动把源代码include/dgl文件夹复制为安装目录C:\dgl_cpp_cpu\include\dgl
